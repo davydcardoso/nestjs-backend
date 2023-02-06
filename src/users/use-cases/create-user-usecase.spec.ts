@@ -82,24 +82,24 @@ describe('CreateUserUseCase', () => {
       expect(result2.value as Error).toEqual(new InvalidPasswordUserError());
     });
 
-    describe('CREATE USER: Validação de registro em banco de dados', () => {
-      it('CREATE USER: Criacão de usuário', async () => {
-        const result = await usecase.perform({
-          name: 'Usuario Teste',
-          email: 'usuario@test.com',
-          password: 'Dv@_8246',
-        });
-
-        expect(result.value as Error).not.toEqual(new Error());
-
-        const prisma = new PrismaClient();
-
-        const user = await prisma.users.findUnique({
-          where: { email: 'usuario@test.com' },
-        });
-
-        expect(user).toBeTruthy()
+    it('CREATE USER: Criacão de usuário', async () => {
+      const result = await usecase.perform({
+        name: 'Usuario Teste',
+        email: 'usuario@test.com',
+        password: 'Dv@_8246',
       });
+
+      expect(result.value as Error).not.toEqual(new Error());
+
+      const prisma = new PrismaClient();
+
+      const user = await prisma.users.findUnique({
+        where: { email: 'usuario@test.com' },
+      });
+
+      expect(user).toBeTruthy();
+
+      await prisma.users.delete({ where: { email: 'usuario@test.com' } });
     });
   });
 });

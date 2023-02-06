@@ -12,6 +12,7 @@ import { Name } from '../domain/entity/users/name';
 import { Email } from '../domain/entity/users/email';
 import { Password } from '../domain/entity/users/password';
 import { UserRepository } from '../infra/repositories/user.repository';
+import { AlreadyExistsUserAccountError } from './errors/already-exists-user-account.error';
 
 type CreateUserUseCaseProps = {
   name: string;
@@ -57,6 +58,14 @@ export class CreateUserUseCase implements UseCase {
     }
 
     const user = userOrError.value;
+
+    const alreadyExistsUser = await this.userRepository.getByEmail(
+      user.email.value,
+    );
+
+    if (alreadyExistsUser) {
+      return left(new AlreadyExistsUserAccountError());
+    }
 
     await this.userRepository.create(user);
 
